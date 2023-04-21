@@ -1,7 +1,7 @@
 {
-  "name": "twitchbot",
+  "name": "translationbot",
   "version": "0.0.1",
-  "description": "First prototype twitch bot",
+  "description": "First prototype twitch transaltion bot",
   "main": "index.js",
   "scripts": {
     "start": "node server.js"
@@ -13,6 +13,7 @@
     "dotenv": "^16.0.3",
     "languagedetect": "^2.0.0",
     "pronouncing": "github:aparrish/pronouncingjs",
-    "tmi.js": "^1.8.5"
+    "tmi.js": "^1.8.5",
+    "translatte": "^3.0.1"
   }
 }

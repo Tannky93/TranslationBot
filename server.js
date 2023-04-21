@@ -2,10 +2,7 @@ require('dotenv').config();
 
 const tmi = require('tmi.js');
 const fs = require('fs');
-const apaPro = require('pronouncing');
-const timer = require('./timer.js');
-const buttsbot = require('./buttsbot.js');
-const { timeStamp } = require('console');
+const checkLang = require('./detectlanguage.js');
 
 const regexpCommand = new RegExp(/^!([a-zA-z0-9]+)(?:\w+)?(.*)?/);
 
@@ -38,15 +35,6 @@ let customCommandTrigger=[];
 let customCommandContent = [];
 var customCount = 0;
 
-// buttsbot variables
-var buttsbotTimeout = false;
-var messagesBetweenButtify = 10;
-var lastmessage = 0;
-var buttified = false;
-
-//Datamining demo
-var dataMinerActive = true;
-
 const client = new tmi.Client({
 	options: { debug: true },
 	identity: {
@@ -64,10 +52,7 @@ client.on('message', (channel, tags, message, self) => {
 	
     if(self) return;
 
-    if(messageCount >= lastmessage + messagesBetweenButtify){
-        buttsbotTimeout = false;
-    }
-
+    
 
     const [raw,command,argument] = message.match(regexpCommand)?? "";
     
@@ -115,20 +100,9 @@ client.on('message', (channel, tags, message, self) => {
         }
     }else{
         
-        if (buttsbotTimeout === false){
-            console.log("Message: "+ message);
-            Buttsbot(channel, message);
-        
-        }
+        checkLang.PerformTranslatation(message);
     }
 
-    if (dataMinerActive === true){
-        MineData(channel,message,tags);
-    }
-
-    messageCount++;
-    console.log("Message Count: "+messageCount);
-    console.log("On timeout: " + buttsbotTimeout);
 });
 
 function CreateCommand(channel,message){
@@ -198,34 +172,5 @@ function ReadFromFile(){
 
 }
 
-async function Timer(channel, message) {
-    var length = timer.TimerParseTime(message);
-    client.say(channel,`The length of the timer is ${length} seconds`);
 
-
-}
-
-function Buttsbot(channel, messageIn){
-    console.log("passed message to Bbot: "+messageIn);
-    let response = buttsbot.stringSplitter(messageIn,buttified);
-    buttified = response[1];
-    console.log("Buttified = "+ buttified);
-    if(buttified === true){
-        client.say(channel, response[0]);
-        lastmessage = messageCount;
-        buttified = false;
-    }else{
-        return;
-    }
-    buttsbotTimeout = true;
-
-}
-
-function MineData(channel,message,tags){
-
-    fs.appendFile("MinedData"+channel+".txt", + " : "+ tags.username+": "+ message + '\n',(err)=>{
-        if(err) throw err;
-        //console.log("data appended" + customCommandTrigger[index]);
-    })
-}
 
